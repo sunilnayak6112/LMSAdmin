@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hirepre Solution – Employee Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   ROOT & RESET
+══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1a56db;--blue-d:#1340b0;--blue-l:#3b82f6;--blue-xl:#60a5fa;
+  --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-200:#bfdbfe;
+  --navy:#0f2d6b;--navy-l:#1a3a80;
+  --white:#ffffff;--off:#f7f9fc;--off2:#f0f4f9;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g400:#94a3b8;--g500:#64748b;--g600:#475569;--g700:#334155;--g900:#0f172a;
+  --green:#16a34a;--green-l:#dcfce7;
+  --yellow:#ca8a04;--yellow-l:#fef9c3;
+  --red:#dc2626;--red-l:#fee2e2;
+  --orange:#ea580c;--orange-l:#ffedd5;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --sh-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh:0 4px 16px rgba(26,86,219,.09),0 1px 4px rgba(0,0,0,.05);
+  --sh-lg:0 12px 40px rgba(26,86,219,.13),0 4px 12px rgba(0,0,0,.07);
+  --r:14px;--r-sm:10px;--r-lg:20px;
+  --tr:.2s cubic-bezier(.4,0,.2,1);
+  --sidebar:260px
+}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--off);color:var(--g900);line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Fraunces',serif;font-weight:600;line-height:1.2}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--blue-200);border-radius:6px}
+input,select,textarea,button{font-family:inherit}
+
+/* ══════════════════════════════════════════
+   PAGES (LOGIN vs APP)
+══════════════════════════════════════════ */
+.screen{display:none}
+.screen.active{display:flex}
+
+/* ══════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════ */
+#login-screen{
+  min-height:100vh;background:var(--off);
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden
+}
+.login-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden
+}
+.login-bg .orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.35
+}
+.login-bg .orb1{width:600px;height:600px;background:radial-gradient(#bfdbfe,transparent);top:-200px;right:-100px}
+.login-bg .orb2{width:400px;height:400px;background:radial-gradient(#dbeafe,transparent);bottom:0;left:-100px}
+.login-card{
+  background:#fff;border-radius:24px;box-shadow:var(--sh-lg);
+  overflow:hidden;width:100%;max-width:440px;
+  position:relative;z-index:1;
+  animation:fadeUp .5s ease both
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.lc-header{
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  padding:36px 36px 28px;color:#fff;text-align:center
+}
+.lc-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
+.logo-box{
+  width:40px;height:40px;border-radius:11px;
+  background:rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-weight:700;font-size:1.1rem;color:#fff;
+  backdrop-filter:blur(4px)
+}
+.lc-logo span{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:600}
+.lc-header h2{font-size:1.6rem;margin-bottom:6px}
+.lc-header p{opacity:.78;font-size:.9rem;font-weight:400;font-family:'Plus Jakarta Sans',sans-serif}
+.lc-body{padding:32px 36px 36px}
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.form-group label{font-size:.8rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.04em}
+.form-group input,.form-group select,.form-group textarea{
+  padding:11px 14px;border-radius:10px;border:1.5px solid var(--g200);
+  font-size:.9rem;outline:none;transition:all var(--tr);background:var(--g50);color:var(--g900)
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--blue);background:#fff;
+  box-shadow:0 0 0 3px rgba(26,86,219,.09)
+}
+.form-group input.error{border-color:var(--red);background:#fff9f9}
+.form-group .err-msg{font-size:.78rem;color:var(--red);display:none}
+.form-group.has-error .err-msg{display:block}
+.pw-wrap{position:relative}
+.pw-wrap input{width:100%;padding-right:44px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--g400);font-size:1rem;transition:color var(--tr)}
+.pw-eye:hover{color:var(--blue)}
+.login-opts{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;font-size:.84rem}
+.login-opts label{display:flex;align-items:center;gap:8px;color:var(--g600);cursor:pointer}
+.login-opts a{color:var(--blue);font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 24px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;border:none;transition:all var(--tr);font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-l));color:#fff;box-shadow:0 4px 14px rgba(26,86,219,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,86,219,.42)}
+.btn-primary:active{transform:translateY(0)}
+.btn-outline{background:transparent;color:var(--blue);border:1.5px solid var(--blue-200)}
+.btn-outline:hover{background:var(--blue-50);border-color:var(--blue)}
+.btn-ghost{background:transparent;color:var(--g500);border:1.5px solid var(--g200)}
+.btn-ghost:hover{background:var(--g100);color:var(--g700)}
+.btn-danger{background:var(--red-l);color:var(--red);border:1.5px solid #fca5a5}
+.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sm{padding:7px 16px;font-size:.82rem;border-radius:8px}
+.btn-full{width:100%}
+.btn-success{background:var(--green-l);color:var(--green);border:1.5px solid #86efac}
+.btn-success:hover{background:var(--green);color:#fff}
+.demo-box{background:var(--blue-50);border:1px solid var(--blue-100);border-radius:10px;padding:12px 16px;margin-top:16px;font-size:.82rem;color:var(--g600)}
+.demo-box p{margin-bottom:3px}
+.demo-box strong{color:var(--blue);font-size:.85rem}
+
+/* ══════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════ */
+#app-screen{
+  flex-direction:row;min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:linear-gradient(180deg,var(--navy) 0%,var(--navy-l) 100%);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;z-index:200;
+  transition:transform var(--tr);overflow:hidden
+}
+.sidebar-top{
+  padding:24px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,.07)
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.sidebar-logo .logo-box{width:34px;height:34px;font-size:.95rem;border-radius:9px}
+.sidebar-logo span{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:#fff}
+.emp-mini{display:flex;align-items:center;gap:12px}
+.emp-mini-av{
+  width:42px;height:42px;border-radius:50%;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.25);object-fit:cover
+}
+.emp-mini-info strong{display:block;font-size:.875rem;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.emp-mini-info span{font-size:.75rem;color:rgba(255,255,255,.5);display:block}
+.emp-mini-info .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#34d399;margin-right:5px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 14px;
+  border-radius:10px;color:rgba(255,255,255,.58);
+  font-size:.875rem;font-weight:500;cursor:pointer;transition:all var(--tr);
+  position:relative
+}
+.nav-item:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9)}
+.nav-item.active{background:rgba(255,255,255,.14);color:#fff}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:60%;background:var(--blue-xl);border-radius:0 3px 3px 0
+}
+.nav-icon{font-size:1.05rem;flex-shrink:0;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--blue-xl);color:#fff;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:20px}
+.sidebar-footer{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,.07)
+}
+.logout-btn{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:10px;color:rgba(255,255,255,.5);font-size:.875rem;
+  cursor:pointer;transition:all var(--tr);border:none;background:none;width:100%;font-family:inherit;font-weight:500
+}
+.logout-btn:hover{background:rgba(239,68,68,.15);color:#fca5a5}
+
+/* MAIN CONTENT */
+.main-wrap{
+  flex:1;margin-left:var(--sidebar);
+  display:flex;flex-direction:column;min-height:100vh
+}
+.topbar{
+  background:#fff;border-bottom:1px solid var(--g200);
+  padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.05)
+}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.hamburger{
+  display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px
+}
+.hamburger span{display:block;width:20px;height:2px;background:var(--g700);border-radius:3px;transition:var(--tr)}
+.page-title{font-family:'Fraunces',serif;font-size:1.25rem;font-weight:600;color:var(--g900)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-search{
+  display:flex;align-items:center;gap:8px;background:var(--g50);
+  border:1.5px solid var(--g200);border-radius:10px;padding:7px 14px;
+  transition:all var(--tr)
+}
+.topbar-search:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,86,219,.07)}
+.topbar-search input{border:none;background:transparent;outline:none;font-size:.875rem;width:180px;color:var(--g700)}
+.topbar-search svg{color:var(--g400);flex-shrink:0}
+.notif-btn{
+  position:relative;width:38px;height:38px;border-radius:10px;
+  background:var(--g50);border:1.5px solid var(--g200);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all var(--tr);font-size:1rem
+}
+.notif-btn:hover{background:var(--blue-50);border-color:var(--blue-200)}
+.notif-dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#ef4444;border:2px solid #fff}
+.topbar-av{
+  width:36px;height:36px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--blue-200);cursor:pointer;transition:border-color var(--tr)
+}
+.topbar-av:hover{border-color:var(--blue)}
+
+/* PAGES */
+.page-content{flex:1;padding:28px 32px;display:none}
+.page-content.active{display:block}
+
+/* ══════════════════════════════════════════
+   COMMON COMPONENTS
+══════════════════════════════════════════ */
+.page-header{margin-bottom:24px}
+.page-header h2{font-size:1.6rem;color:var(--g900);margin-bottom:4px}
+.page-header p{color:var(--g500);font-size:.9rem;font-weight:400;font-family:'Plus Jakarta Sans',sans-serif}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--g400);margin-bottom:8px}
+.breadcrumb .sep{color:var(--g300)}
+.breadcrumb .active{color:var(--blue);font-weight:600}
+
+/* Cards */
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh-sm);transition:all var(--tr)}
+.card:hover{box-shadow:var(--sh)}
+.card-pad{padding:22px 24px}
+
+/* Summary Cards */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.sum-card{
+  background:#fff;border-radius:var(--r);padding:20px;
+  border:1px solid var(--g100);box-shadow:var(--sh-sm);
+  display:flex;align-items:flex-start;gap:14px;
+  transition:all var(--tr);position:relative;overflow:hidden
+}
+.sum-card::after{
+  content:'';position:absolute;top:0;right:0;width:80px;height:80px;
+  border-radius:50%;transform:translate(30px,-30px);opacity:.06
+}
+.sum-card.blue::after{background:var(--blue)}
+.sum-card.green::after{background:var(--green)}
+.sum-card.yellow::after{background:var(--yellow)}
+.sum-card.purple::after{background:var(--purple)}
+.sum-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.sum-icon{
+  width:44px;height:44px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;flex-shrink:0
+}
+.sum-icon.blue{background:var(--blue-100);color:var(--blue)}
+.sum-icon.green{background:var(--green-l);color:var(--green)}
+.sum-icon.yellow{background:var(--yellow-l);color:var(--yellow)}
+.sum-icon.purple{background:var(--purple-l);color:var(--purple)}
+.sum-icon.orange{background:var(--orange-l);color:var(--orange)}
+.sum-info{flex:1;min-width:0}
+.sum-info strong{font-family:'Fraunces',serif;font-size:1.5rem;display:block;color:var(--g900)}
+.sum-info span{font-size:.78rem;color:var(--g500);display:block;white-space:nowrap}
+.sum-info .trend{font-size:.72rem;font-weight:600;margin-top:4px;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px}
+.trend.up{background:var(--green-l);color:var(--green)}
+.trend.down{background:var(--red-l);color:var(--red)}
+.trend.neutral{background:var(--blue-100);color:var(--blue)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.badge-green{background:var(--green-l);color:var(--green)}
+.badge-yellow{background:var(--yellow-l);color:var(--yellow)}
+.badge-red{background:var(--red-l);color:var(--red)}
+.badge-blue{background:var(--blue-100);color:var(--blue)}
+.badge-gray{background:var(--g100);color:var(--g600)}
+.badge-orange{background:var(--orange-l);color:var(--orange)}
+.badge-purple{background:var(--purple-l);color:var(--purple)}
+
+/* Tables */
+.table-wrap{overflow-x:auto;border-radius:var(--r-sm)}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead th{
+  text-align:left;padding:11px 14px;
+  font-size:.73rem;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--g500);background:var(--g50);font-weight:700;
+  border-bottom:1px solid var(--g200)
+}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--g50);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--blue-50)}
+
+/* Section Titles */
+.sec-title{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px
+}
+.sec-title h3{font-size:1.1rem;color:var(--g900)}
+.sec-title p{font-size:.82rem;color:var(--g500);font-weight:400;font-family:'Plus Jakarta Sans',sans-serif;margin-top:1px}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--g900);color:#fff;padding:13px 20px;border-radius:12px;
+  font-size:.875rem;font-weight:600;box-shadow:var(--sh-lg);
+  transform:translateY(20px);opacity:0;transition:all .3s ease;pointer-events:none;
+  display:flex;align-items:center;gap:10px;max-width:340px
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:linear-gradient(135deg,#15803d,#16a34a)}
+.toast.error{background:linear-gradient(135deg,#dc2626,#ef4444)}
+.toast.info{background:linear-gradient(135deg,var(--navy),var(--blue))}
+
+/* Overlay (mobile) */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:190;backdrop-filter:blur(2px)}
+.sidebar-overlay.active{display:block}
+
+/* ══════════════════════════════════════════
+   DASHBOARD PAGE
+══════════════════════════════════════════ */
+.welcome-banner{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,var(--blue-l) 100%);
+  border-radius:var(--r-lg);padding:28px 32px;color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;position:relative;overflow:hidden
+}
+.welcome-banner::before{
+  content:'';position:absolute;right:-60px;top:-60px;
+  width:240px;height:240px;border-radius:50%;
+  background:rgba(255,255,255,.06)
+}
+.welcome-banner::after{
+  content:'';position:absolute;right:60px;bottom:-80px;
+  width:180px;height:180px;border-radius:50%;
+  background:rgba(255,255,255,.04)
+}
+.wb-text{position:relative;z-index:1}
+.wb-text .greeting{font-size:.85rem;opacity:.75;font-weight:500;margin-bottom:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.wb-text h2{font-size:1.7rem;margin-bottom:8px}
+.wb-text p{opacity:.75;font-size:.875rem;font-weight:400;font-family:'Plus Jakarta Sans',sans-serif;max-width:400px}
+.wb-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.15);backdrop-filter:blur(6px);
+  padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;margin-top:14px;
+  border:1px solid rgba(255,255,255,.2)
+}
+.wb-right{position:relative;z-index:1;text-align:right;flex-shrink:0}
+.wb-av{
+  width:80px;height:80px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.3);object-fit:cover
+}
+.wb-date{font-size:.78rem;opacity:.6;margin-top:8px;font-family:'Plus Jakarta Sans',sans-serif}
+
+.dash-row{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+.dash-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px}
+
+/* Attendance mini calendar */
+.att-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:12px}
+.att-day{
+  aspect-ratio:1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:600;cursor:default
+}
+.att-day.hd{color:var(--g400);font-size:.7rem;font-weight:700}
+.att-day.present{background:var(--green-l);color:var(--green)}
+.att-day.absent{background:var(--red-l);color:var(--red)}
+.att-day.leave{background:var(--yellow-l);color:var(--yellow)}
+.att-day.weekend{background:var(--g100);color:var(--g400)}
+.att-day.today{background:var(--blue);color:#fff}
+.att-day.future{color:var(--g300)}
+
+/* Upcoming events */
+.event-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px 0;border-bottom:1px solid var(--g50)
+}
+.event-item:last-child{border-bottom:none}
+.ev-date{
+  background:var(--blue-50);border-radius:9px;padding:8px 10px;text-align:center;flex-shrink:0;min-width:44px
+}
+.ev-date strong{display:block;font-family:'Fraunces',serif;font-size:1.15rem;color:var(--blue)}
+.ev-date span{font-size:.65rem;color:var(--g500);text-transform:uppercase;font-weight:600}
+.ev-info p{font-size:.875rem;font-weight:500;margin-bottom:1px}
+.ev-info small{font-size:.78rem;color:var(--g500)}
+
+/* Quick actions */
+.quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.quick-btn{
+  background:var(--g50);border:1.5px solid var(--g200);border-radius:var(--r-sm);
+  padding:14px 12px;text-align:center;cursor:pointer;transition:all var(--tr)
+}
+.quick-btn:hover{background:var(--blue-50);border-color:var(--blue-200);transform:translateY(-2px)}
+.quick-btn .qi{font-size:1.4rem;margin-bottom:6px}
+.quick-btn span{display:block;font-size:.78rem;font-weight:600;color:var(--g600)}
+
+/* ══════════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════════ */
+.profile-header{
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  border-radius:var(--r-lg);padding:28px 32px;color:#fff;
+  display:flex;align-items:center;gap:24px;margin-bottom:24px;
+  position:relative;overflow:hidden
+}
+.profile-header::before{
+  content:'';position:absolute;right:-40px;top:-40px;
+  width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05)
+}
+.ph-av{
+  width:88px;height:88px;border-radius:50%;
+  border:3px solid rgba(255,255,255,.35);object-fit:cover;flex-shrink:0
+}
+.ph-info{flex:1;position:relative;z-index:1}
+.ph-info h2{font-size:1.5rem;margin-bottom:4px}
+.ph-info .ph-role{opacity:.75;font-size:.9rem;font-weight:400;font-family:'Plus Jakarta Sans',sans-serif}
+.ph-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.ph-badge{
+  background:rgba(255,255,255,.15);backdrop-filter:blur(4px);
+  padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600;
+  border:1px solid rgba(255,255,255,.2)
+}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.detail-row{display:flex;flex-direction:column;gap:4px;padding:14px 0;border-bottom:1px solid var(--g50)}
+.detail-row:last-child{border-bottom:none}
+.detail-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--g400)}
+.detail-value{font-size:.9rem;font-weight:500;color:var(--g900)}
+.edit-section{margin-top:20px}
+.edit-toggle-btn{cursor:pointer}
+.edit-form{display:none;margin-top:16px}
+.edit-form.open{display:block}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* ══════════════════════════════════════════
+   ATTENDANCE PAGE
+══════════════════════════════════════════ */
+.att-month-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.att-month-nav button{
+  width:34px;height:34px;border-radius:9px;border:1.5px solid var(--g200);
+  background:#fff;cursor:pointer;font-size:1rem;transition:all var(--tr);
+  display:flex;align-items:center;justify-content:center
+}
+.att-month-nav button:hover{background:var(--blue-50);border-color:var(--blue-200)}
+.att-month-nav h3{font-size:1rem;color:var(--g900);flex:1;text-align:center}
+.att-sum-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.att-sum-box{background:#fff;border-radius:var(--r-sm);padding:16px;border:1px solid var(--g200);text-align:center}
+.att-sum-box strong{font-family:'Fraunces',serif;font-size:1.6rem;display:block;margin-bottom:2px}
+.att-sum-box span{font-size:.75rem;color:var(--g500);font-weight:600}
+.att-sum-box.green strong{color:var(--green)}.att-sum-box.red strong{color:var(--red)}
+.att-sum-box.yellow strong{color:var(--yellow)}.att-sum-box.blue strong{color:var(--blue)}
+
+/* Full calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-head{text-align:center;font-size:.73rem;font-weight:700;text-transform:uppercase;color:var(--g500);padding:6px 0}
+.cal-day{
+  aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;font-size:.82rem;font-weight:600;
+  position:relative;cursor:default;transition:all var(--tr)
+}
+.cal-day .day-num{font-size:.85rem}
+.cal-day .day-status{font-size:.6rem;font-weight:700;text-transform:uppercase;margin-top:1px}
+.cal-day.present{background:var(--green-l);color:var(--green)}
+.cal-day.absent{background:var(--red-l);color:var(--red)}
+.cal-day.leave{background:var(--yellow-l);color:var(--yellow)}
+.cal-day.holiday{background:var(--purple-l);color:var(--purple)}
+.cal-day.weekend{background:var(--g50);color:var(--g400)}
+.cal-day.today-cal{background:var(--blue);color:#fff}
+.cal-day.empty{background:transparent}
+.cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--g600)}
+.leg-dot{width:10px;height:10px;border-radius:3px}
+
+/* ══════════════════════════════════════════
+   PAYSLIPS PAGE
+══════════════════════════════════════════ */
+.payslip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.payslip-card{
+  background:#fff;border-radius:var(--r);border:1px solid var(--g200);
+  overflow:hidden;transition:all var(--tr)
+}
+.payslip-card:hover{transform:translateY(-3px);box-shadow:var(--sh)}
+.ps-header{
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  padding:18px 20px;color:#fff
+}
+.ps-header .month{font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:2px}
+.ps-header .year{font-size:.8rem;opacity:.7}
+.ps-body{padding:18px 20px}
+.ps-amount{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--g900);margin-bottom:3px}
+.ps-label{font-size:.78rem;color:var(--g500);margin-bottom:14px}
+.ps-mini-breakdown{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.ps-row{display:flex;justify-content:space-between;font-size:.82rem}
+.ps-row span{color:var(--g500)}.ps-row strong{color:var(--g700)}
+.ps-row.deduction strong{color:var(--red)}
+.ps-divider{height:1px;background:var(--g100);margin:8px 0}
+.ps-row.net strong{color:var(--blue);font-size:.9rem}
+.ps-actions{display:flex;gap:8px}
+
+/* ══════════════════════════════════════════
+   LETTERS PAGE
+══════════════════════════════════════════ */
+.letters-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.letter-card{
+  background:#fff;border-radius:var(--r);border:1px solid var(--g200);
+  padding:22px;transition:all var(--tr);display:flex;flex-direction:column;gap:14px
+}
+.letter-card:hover{transform:translateY(-2px);box-shadow:var(--sh);border-color:var(--blue-200)}
+.lc-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0
+}
+.lc-icon.offer{background:var(--blue-100)}
+.lc-icon.hike{background:var(--green-l)}
+.lc-icon.exp{background:var(--yellow-l)}
+.lc-icon.appoint{background:var(--purple-l)}
+.letter-meta{flex:1}
+.letter-meta h4{font-size:1rem;margin-bottom:4px}
+.letter-meta p{font-size:.82rem;color:var(--g500)}
+.letter-meta .lm-date{font-size:.75rem;color:var(--g400);margin-top:6px;font-weight:600}
+.letter-actions{display:flex;gap:8px}
+
+/* Letter preview modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(15,23,42,.55);
+  display:none;align-items:center;justify-content:center;z-index:500;
+  backdrop-filter:blur(4px);padding:20px
+}
+.modal-overlay.active{display:flex}
+.modal{
+  background:#fff;border-radius:20px;width:100%;max-width:640px;
+  max-height:90vh;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.25);animation:fadeUp .25s ease
+}
+.modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;border-bottom:1px solid var(--g100)
+}
+.modal-header h3{font-size:1.1rem}
+.modal-close{
+  width:30px;height:30px;border-radius:8px;border:none;
+  background:var(--g100);cursor:pointer;font-size:.9rem;
+  display:flex;align-items:center;justify-content:center;transition:all var(--tr)
+}
+.modal-close:hover{background:var(--g200)}
+.modal-body{padding:24px;overflow-y:auto;flex:1}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--g100);display:flex;justify-content:flex-end;gap:10px}
+
+/* Letter Document Style */
+.letter-doc{font-family:'Plus Jakarta Sans',sans-serif;padding:8px}
+.letter-doc .doc-header{text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid var(--blue)}
+.letter-doc .company-name{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--blue);font-weight:700}
+.letter-doc .company-addr{font-size:.78rem;color:var(--g500);margin-top:2px}
+.letter-doc .doc-title{font-family:'Fraunces',serif;font-size:1.1rem;text-align:center;margin:16px 0;text-decoration:underline;color:var(--g900)}
+.letter-doc .doc-body{font-size:.875rem;line-height:1.8;color:var(--g700)}
+.letter-doc .doc-body p{margin-bottom:12px}
+.letter-doc .doc-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.84rem}
+.letter-doc .doc-table th,.letter-doc .doc-table td{padding:9px 12px;border:1px solid var(--g200);text-align:left}
+.letter-doc .doc-table th{background:var(--blue-50);color:var(--blue);font-weight:700}
+.letter-doc .doc-sign{margin-top:28px}
+.letter-doc .doc-sign p{font-size:.875rem;color:var(--g700)}
+.letter-doc .doc-sign .sig-line{border-top:1px solid var(--g300);margin-top:24px;padding-top:8px;display:inline-block;min-width:160px;font-size:.8rem;color:var(--g500)}
+
+/* ══════════════════════════════════════════
+   LEAVE MANAGEMENT PAGE
+══════════════════════════════════════════ */
+.leave-tabs{display:flex;gap:4px;background:var(--g100);padding:5px;border-radius:12px;width:fit-content;margin-bottom:24px}
+.leave-tab{
+  padding:8px 20px;border-radius:9px;font-size:.85rem;font-weight:600;
+  cursor:pointer;transition:all var(--tr);color:var(--g600)
+}
+.leave-tab.active{background:#fff;color:var(--blue);box-shadow:var(--sh-sm)}
+.leave-balance-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.lb-card{
+  background:#fff;border-radius:var(--r-sm);padding:16px;
+  border:1px solid var(--g200);text-align:center
+}
+.lb-progress{
+  width:64px;height:64px;margin:0 auto 10px;position:relative
+}
+.lb-progress svg{width:100%;height:100%;transform:rotate(-90deg)}
+.lb-progress circle{fill:none;stroke-width:5;stroke-linecap:round}
+.lb-progress .track{stroke:var(--g100)}
+.lb-progress .fill{transition:stroke-dasharray .6s ease}
+.lb-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600
+}
+.lb-card h4{font-size:.82rem;font-weight:700;color:var(--g700);margin-bottom:2px}
+.lb-card p{font-size:.72rem;color:var(--g500)}
+
+/* Leave form */
+.leave-form-card{background:#fff;border-radius:var(--r);border:1px solid var(--g200);padding:24px;margin-bottom:24px}
+.apply-btn-row{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+/* ══════════════════════════════════════════
+   SALARY DETAILS PAGE
+══════════════════════════════════════════ */
+.salary-top{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.salary-hero{
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  border-radius:var(--r-lg);padding:28px;color:#fff
+}
+.salary-hero h3{font-size:.9rem;opacity:.7;font-weight:400;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:8px}
+.salary-hero .amount{font-family:'Fraunces',serif;font-size:2.4rem}
+.salary-hero .ctc{font-size:.82rem;opacity:.65;margin-top:4px;font-family:'Plus Jakarta Sans',sans-serif}
+.salary-hero .revision{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,.15);padding:5px 14px;border-radius:20px;
+  font-size:.8rem;font-weight:600;margin-top:16px;
+  border:1px solid rgba(255,255,255,.2)
+}
+.breakdown-card{background:#fff;border-radius:var(--r);border:1px solid var(--g200);padding:22px}
+.sal-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--g50);font-size:.875rem
+}
+.sal-row:last-child{border-bottom:none}
+.sal-row .sr-label{color:var(--g600);display:flex;align-items:center;gap:8px}
+.sal-row .sr-label .sr-dot{width:7px;height:7px;border-radius:50%}
+.sal-row .sr-val{font-weight:600;color:var(--g900)}
+.sal-row.deduct .sr-val{color:var(--red)}
+.sal-row.net-row{background:var(--blue-50);border-radius:9px;padding:12px 14px;margin-top:8px}
+.sal-row.net-row .sr-label{font-weight:700;color:var(--blue)}
+.sal-row.net-row .sr-val{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--blue)}
+.salary-history{margin-top:24px}
+.progress-bar{background:var(--g100);border-radius:20px;height:8px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--blue),var(--blue-l));transition:width .8s ease}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:1024px){
+  .dash-row{grid-template-columns:1fr}
+  .salary-top{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  :root{--sidebar:260px}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-wrap{margin-left:0}
+  .hamburger{display:flex}
+  .topbar-search{display:none}
+  .page-content{padding:18px 16px}
+  .sum-grid{grid-template-columns:repeat(2,1fr)}
+  .profile-grid{grid-template-columns:1fr}
+  .att-sum-row{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+  .welcome-banner{flex-direction:column;gap:16px}
+  .wb-right{text-align:left}
+  .dash-row-3{grid-template-columns:1fr}
+  .topbar{padding:0 16px}
+}
+@media(max-width:480px){
+  .sum-grid{grid-template-columns:1fr}
+  .payslip-grid{grid-template-columns:1fr}
+  .leave-balance-grid{grid-template-columns:repeat(2,1fr)}
+  .lc-body{padding:24px 20px 28px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div id="login-screen" class="screen active">
+  <div class="login-bg">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+  </div>
+  <div class="login-card">
+    <div class="lc-header">
+      <div class="lc-logo">
+        <div class="logo-box">H</div>
+        <span>Hirepre Solution</span>
+      </div>
+      <h2>Employee Portal</h2>
+      <p>Sign in to access your workspace</p>
+    </div>
+    <div class="lc-body">
+      <div class="form-group" id="fg-email">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="alex@hirepre.com" autocomplete="email">
+        <span class="err-msg">Please enter a valid email address</span>
+      </div>
+      <div class="form-group" id="fg-pw">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-pw" placeholder="••••••••" autocomplete="current-password">
+          <button class="pw-eye" onclick="togglePw('login-pw',this)" type="button">👁</button>
+        </div>
+        <span class="err-msg">Password must be at least 6 characters</span>
+      </div>
+      <div class="login-opts">
+        <label><input type="checkbox" id="rememberMe"> Remember me</label>
+        <a href="#" onclick="return false">Forgot Password?</a>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+      <div class="demo-box">
+        <p>Demo Credentials:</p>
+        <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b2d3ded7caf2dadbc0d7c2c0d79cd1dddf">[email&#160;protected]</a></p>
+        <p><strong>Password:</strong> emp123</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APP SCREEN ══════════════ -->
+<div id="app-screen" class="screen">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div class="logo-box">H</div>
+        <span>Hirepre Solution</span>
+      </div>
+      <div class="emp-mini">
+        <img class="emp-mini-av" src="https://ui-avatars.com/api/?name=Alex+Kumar&background=1a56db&color=fff&size=80" alt="Employee" id="sidebarAv">
+        <div class="emp-mini-info">
+          <strong id="sidebarName">Alex Kumar</strong>
+          <span id="sidebarRole">Senior Developer</span>
+          <span><span class="status-dot"></span>Online</span>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="goPage('profile',this)"><span class="nav-icon">👤</span> My Profile</div>
+      <div class="nav-item" onclick="goPage('attendance',this)"><span class="nav-icon">📅</span> Attendance</div>
+      <div class="nav-item" onclick="goPage('payslips',this)"><span class="nav-icon">💳</span> Payslips</div>
+      <div class="nav-item" onclick="goPage('letters',this)"><span class="nav-icon">📄</span> Letters</div>
+      <div class="nav-item" onclick="goPage('leave',this)"><span class="nav-icon">🏖️</span> Leave Management <span class="nav-badge" id="pendingBadge">2</span></div>
+      <div class="nav-item" onclick="goPage('salary',this)"><span class="nav-icon">💰</span> Salary Details</div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <span>🚪</span> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrap">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <span></span><span></span><span></span>
+        </button>
+        <span class="page-title" id="pageTitle">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Search anything...">
+        </div>
+        <div class="notif-btn" onclick="showToast('You have 3 new notifications','info')">
+          🔔<span class="notif-dot"></span>
+        </div>
+        <img class="topbar-av" src="https://ui-avatars.com/api/?name=Alex+Kumar&background=1a56db&color=fff&size=72" alt="" id="topbarAv" onclick="goPage('profile',null)">
+      </div>
+    </header>
+
+    <!-- ══ DASHBOARD PAGE ══ -->
+    <section id="page-dashboard" class="page-content active">
+      <div class="welcome-banner">
+        <div class="wb-text">
+          <div class="greeting">Tuesday, March 3, 2026</div>
+          <h2>Good Morning, <span id="wbName">Alex</span>! 👋</h2>
+          <p>You've been present for 18 days this month. Keep it up! Your payroll is processing for March.</p>
+          <div class="wb-badge">⚡ HP001 · Engineering Department</div>
+        </div>
+        <div class="wb-right">
+          <img class="wb-av" src="https://ui-avatars.com/api/?name=Alex+Kumar&background=fff&color=1a56db&size=160" alt="" id="bannerAv">
+          <div class="wb-date" id="wbDate">March 2026</div>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="sum-grid">
+        <div class="sum-card blue">
+          <div class="sum-icon blue">🏖️</div>
+          <div class="sum-info">
+            <strong>12</strong><span>Leave Balance</span>
+            <span class="trend neutral">Annual · 8 used</span>
+          </div>
+        </div>
+        <div class="sum-card green">
+          <div class="sum-icon green">✅</div>
+          <div class="sum-info">
+            <strong>18</strong><span>Present This Month</span>
+            <span class="trend up">↑ 92% rate</span>
+          </div>
+        </div>
+        <div class="sum-card yellow">
+          <div class="sum-icon yellow">💰</div>
+          <div class="sum-info">
+            <strong>Processing</strong><span>March Salary</span>
+            <span class="trend neutral">Due Mar 10</span>
+          </div>
+        </div>
+        <div class="sum-card purple">
+          <div class="sum-icon purple">⏳</div>
+          <div class="sum-info">
+            <strong>2</strong><span>Pending Requests</span>
+            <span class="trend down">↓ Awaiting approval</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-row">
+        <!-- Mini Attendance Calendar -->
+        <div class="card card-pad">
+          <div class="sec-title">
+            <div><h3>March 2026 Attendance</h3><p>Your attendance at a glance</p></div>
+            <button class="btn btn-outline btn-sm" onclick="goPage('attendance',null)">View Full →</button>
+          </div>
+          <div class="att-mini-grid" id="dashMiniCal"></div>
+          <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+            <span style="font-size:.75rem;color:var(--g500);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--green-l);display:inline-block"></span>Present</span>
+            <span style="font-size:.75rem;color:var(--g500);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--red-l);display:inline-block"></span>Absent</span>
+            <span style="font-size:.75rem;color:var(--g500);display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:var(--yellow-l);display:inline-block"></span>Leave</span>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Quick Actions -->
+          <div class="card card-pad">
+            <div class="sec-title"><div><h3>Quick Actions</h3></div></div>
+            <div class="quick-grid">
+              <div class="quick-btn" onclick="goPage('leave',null);switchLeaveTab('apply')">
+                <div class="qi">📝</div><span>Apply Leave</span>
+              </div>
+              <div class="quick-btn" onclick="goPage('payslips',null)">
+                <div class="qi">💳</div><span>Download Payslip</span>
+              </div>
+              <div class="quick-btn" onclick="goPage('letters',null)">
+                <div class="qi">📄</div><span>View Letters</span>
+              </div>
+              <div class="quick-btn" onclick="goPage('salary',null)">
+                <div class="qi">💰</div><span>Salary Details</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Events -->
+          <div class="card card-pad">
+            <div class="sec-title"><div><h3>Upcoming Events</h3></div></div>
+            <div class="event-item">
+              <div class="ev-date"><strong>05</strong><span>Mar</span></div>
+              <div class="ev-info"><p>Q1 Performance Review</p><small>Scheduled · All Departments</small></div>
+            </div>
+            <div class="event-item">
+              <div class="ev-date"><strong>10</strong><span>Mar</span></div>
+              <div class="ev-info"><p>Salary Credit Day</p><small>Finance Team</small></div>
+            </div>
+            <div class="event-item">
+              <div class="ev-date"><strong>15</strong><span>Mar</span></div>
+              <div class="ev-info"><p>Team Building Workshop</p><small>Mandatory · All Staff</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Leave Requests -->
+      <div class="card card-pad">
+        <div class="sec-title">
+          <div><h3>Recent Leave Requests</h3></div>
+          <button class="btn btn-outline btn-sm" onclick="goPage('leave',null)">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Annual Leave</td><td>Feb 20</td><td>Feb 21</td><td>2</td><td>Personal work</td><td><span class="badge badge-green">Approved</span></td></tr>
+              <tr><td>Sick Leave</td><td>Feb 10</td><td>Feb 10</td><td>1</td><td>Fever</td><td><span class="badge badge-green">Approved</span></td></tr>
+              <tr><td>Casual Leave</td><td>Mar 5</td><td>Mar 7</td><td>3</td><td>Family event</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+              <tr><td>Annual Leave</td><td>Mar 20</td><td>Mar 22</td><td>3</td><td>Vacation</td><td><span class="badge badge-yellow">Pending</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PROFILE PAGE ══ -->
+    <section id="page-profile" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">My Profile</span></div>
+      <div class="page-header"><h2>My Profile</h2><p>View and manage your personal information</p></div>
+
+      <div class="profile-header">
+        <img class="ph-av" src="https://ui-avatars.com/api/?name=Alex+Kumar&background=fff&color=1a56db&size=160" alt="">
+        <div class="ph-info">
+          <h2>Alex Kumar</h2>
+          <div class="ph-role">Senior Developer · Engineering Department</div>
+          <div class="ph-badges">
+            <span class="ph-badge">📋 HP001</span>
+            <span class="ph-badge">📅 Joined Mar 2022</span>
+            <span class="ph-badge">🟢 Active</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <!-- Personal Info -->
+        <div class="card card-pad">
+          <div class="sec-title"><div><h3>Personal Information</h3></div></div>
+          <div class="detail-row"><div class="detail-label">Full Name</div><div class="detail-value">Alex Kumar</div></div>
+          <div class="detail-row"><div class="detail-label">Email Address</div><div class="detail-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="751419100d351d1c07100507105b161a18">[email&#160;protected]</a></div></div>
+          <div class="detail-row"><div class="detail-label">Phone Number</div><div class="detail-value">+91 98765 43210</div></div>
+          <div class="detail-row"><div class="detail-label">Date of Birth</div><div class="detail-value">April 15, 1995</div></div>
+          <div class="detail-row"><div class="detail-label">Gender</div><div class="detail-value">Male</div></div>
+          <div class="detail-row"><div class="detail-label">Address</div><div class="detail-value">42 MG Road, Bengaluru, Karnataka 560001</div></div>
+        </div>
+
+        <!-- Work Info -->
+        <div class="card card-pad">
+          <div class="sec-title"><div><h3>Work Information</h3></div></div>
+          <div class="detail-row"><div class="detail-label">Employee ID</div><div class="detail-value">HP001</div></div>
+          <div class="detail-row"><div class="detail-label">Department</div><div class="detail-value">Engineering</div></div>
+          <div class="detail-row"><div class="detail-label">Designation</div><div class="detail-value">Senior Developer</div></div>
+          <div class="detail-row"><div class="detail-label">Reporting Manager</div><div class="detail-value">James Wong (HP003)</div></div>
+          <div class="detail-row"><div class="detail-label">Date of Joining</div><div class="detail-value">March 15, 2022</div></div>
+          <div class="detail-row"><div class="detail-label">Employment Type</div><div class="detail-value">Full Time · Permanent</div></div>
+        </div>
+      </div>
+
+      <!-- Edit Profile -->
+      <div class="card card-pad" style="margin-top:20px">
+        <div class="sec-title">
+          <div><h3>Edit Profile</h3><p>Update your contact details</p></div>
+          <button class="btn btn-outline btn-sm edit-toggle-btn" onclick="toggleEditForm()">✏️ Edit Profile</button>
+        </div>
+        <div class="edit-form" id="editForm">
+          <div class="form-row">
+            <div class="form-group"><label>Phone Number</label><input type="tel" value="+91 98765 43210" id="editPhone"></div>
+            <div class="form-group"><label>Personal Email</label><input type="email" value="alex.personal@gmail.com" id="editPEmail"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Emergency Contact Name</label><input type="text" value="Priya Kumar" id="editECName"></div>
+            <div class="form-group"><label>Emergency Contact Phone</label><input type="tel" value="+91 87654 32109" id="editECPhone"></div>
+          </div>
+          <div class="form-group"><label>Current Address</label><textarea rows="2" id="editAddr">42 MG Road, Bengaluru, Karnataka 560001</textarea></div>
+          <div class="apply-btn-row">
+            <button class="btn btn-ghost btn-sm" onclick="toggleEditForm()">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="card card-pad" style="margin-top:20px">
+        <div class="sec-title"><div><h3>Documents</h3><p>Your uploaded documents</p></div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.4rem">📄</span>
+            <div><strong style="font-size:.84rem;display:block">Aadhaar Card</strong><span style="font-size:.75rem;color:var(--g500)">Verified ✓</span></div>
+          </div>
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.4rem">📄</span>
+            <div><strong style="font-size:.84rem;display:block">PAN Card</strong><span style="font-size:.75rem;color:var(--g500)">Verified ✓</span></div>
+          </div>
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.4rem">🎓</span>
+            <div><strong style="font-size:.84rem;display:block">Degree Certificate</strong><span style="font-size:.75rem;color:var(--g500)">Uploaded</span></div>
+          </div>
+          <div style="background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:14px;display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.4rem">🏦</span>
+            <div><strong style="font-size:.84rem;display:block">Bank Details</strong><span style="font-size:.75rem;color:var(--g500)">Verified ✓</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ ATTENDANCE PAGE ══ -->
+    <section id="page-attendance" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">Attendance</span></div>
+      <div class="page-header"><h2>My Attendance</h2><p>Track your attendance history and monthly summary</p></div>
+
+      <div class="att-month-nav">
+        <button onclick="changeAttMonth(-1)">‹</button>
+        <h3 id="attMonthLabel">March 2026</h3>
+        <button onclick="changeAttMonth(1)">›</button>
+      </div>
+
+      <div class="att-sum-row">
+        <div class="att-sum-box green"><strong id="attPresent">18</strong><span>Present</span></div>
+        <div class="att-sum-box red"><strong id="attAbsent">2</strong><span>Absent</span></div>
+        <div class="att-sum-box yellow"><strong id="attLeave">3</strong><span>On Leave</span></div>
+        <div class="att-sum-box blue"><strong id="attHoliday">1</strong><span>Holiday</span></div>
+      </div>
+
+      <div class="card card-pad" style="margin-bottom:20px">
+        <div class="sec-title"><div><h3>Monthly Calendar</h3></div></div>
+        <div class="cal-grid" id="attCalGrid"></div>
+        <div class="cal-legend">
+          <div class="leg-item"><span class="leg-dot" style="background:var(--green-l);border:1px solid #86efac"></span>Present</div>
+          <div class="leg-item"><span class="leg-dot" style="background:var(--red-l);border:1px solid #fca5a5"></span>Absent</div>
+          <div class="leg-item"><span class="leg-dot" style="background:var(--yellow-l);border:1px solid #fde047"></span>Leave</div>
+          <div class="leg-item"><span class="leg-dot" style="background:var(--purple-l);border:1px solid #c4b5fd"></span>Holiday</div>
+          <div class="leg-item"><span class="leg-dot" style="background:var(--g100);border:1px solid var(--g200)"></span>Weekend</div>
+        </div>
+      </div>
+
+      <!-- Detailed Log -->
+      <div class="card card-pad">
+        <div class="sec-title"><div><h3>Attendance Log</h3></div></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Day</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Status</th></tr></thead>
+            <tbody id="attLogBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PAYSLIPS PAGE ══ -->
+    <section id="page-payslips" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">Payslips</span></div>
+      <div class="page-header"><h2>My Payslips</h2><p>View and download your monthly salary slips</p></div>
+
+      <div class="sum-grid" style="margin-bottom:24px">
+        <div class="sum-card blue"><div class="sum-icon blue">💰</div><div class="sum-info"><strong>$4,680</strong><span>Last Month Net</span></div></div>
+        <div class="sum-card green"><div class="sum-icon green">📈</div><div class="sum-info"><strong>12</strong><span>Payslips Available</span></div></div>
+        <div class="sum-card yellow"><div class="sum-icon yellow">⏳</div><div class="sum-info"><strong>Mar 10</strong><span>Next Credit Date</span></div></div>
+        <div class="sum-card purple"><div class="sum-icon purple">🏦</div><div class="sum-info"><strong>HDFC Bank</strong><span>Salary Account</span></div></div>
+      </div>
+
+      <div class="payslip-grid" id="payslipGrid"></div>
+    </section>
+
+    <!-- ══ LETTERS PAGE ══ -->
+    <section id="page-letters" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">Letters</span></div>
+      <div class="page-header"><h2>My Letters</h2><p>Official letters and documents issued to you</p></div>
+
+      <div class="letters-grid">
+        <div class="letter-card">
+          <div class="lc-icon offer">📋</div>
+          <div class="letter-meta">
+            <h4>Offer Letter</h4>
+            <p>Your official offer letter from Hirepre Solution</p>
+            <div class="lm-date">📅 Issued: March 1, 2022</div>
+          </div>
+          <div class="letter-actions">
+            <button class="btn btn-outline btn-sm" onclick="openLetterModal('offer')">👁 View</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Offer Letter downloaded!','success')">⬇ Download</button>
+          </div>
+        </div>
+
+        <div class="letter-card">
+          <div class="lc-icon hike">📈</div>
+          <div class="letter-meta">
+            <h4>Increment / Hike Letter</h4>
+            <p>Salary increment letter — Annual Review 2025</p>
+            <div class="lm-date">📅 Issued: January 10, 2026</div>
+          </div>
+          <div class="letter-actions">
+            <button class="btn btn-outline btn-sm" onclick="openLetterModal('hike')">👁 View</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Hike Letter downloaded!','success')">⬇ Download</button>
+          </div>
+        </div>
+
+        <div class="letter-card">
+          <div class="lc-icon exp">📜</div>
+          <div class="letter-meta">
+            <h4>Experience Letter</h4>
+            <p>Issued upon request for background verification</p>
+            <div class="lm-date">📅 Issued: February 5, 2026</div>
+          </div>
+          <div class="letter-actions">
+            <button class="btn btn-outline btn-sm" onclick="openLetterModal('experience')">👁 View</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Experience Letter downloaded!','success')">⬇ Download</button>
+          </div>
+        </div>
+
+        <div class="letter-card">
+          <div class="lc-icon appoint">🤝</div>
+          <div class="letter-meta">
+            <h4>Appointment Letter</h4>
+            <p>Formal appointment confirmation letter</p>
+            <div class="lm-date">📅 Issued: March 15, 2022</div>
+          </div>
+          <div class="letter-actions">
+            <button class="btn btn-outline btn-sm" onclick="openLetterModal('appointment')">👁 View</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Appointment Letter downloaded!','success')">⬇ Download</button>
+          </div>
+        </div>
+
+        <div class="letter-card">
+          <div class="lc-icon offer" style="background:var(--orange-l)">📊</div>
+          <div class="letter-meta">
+            <h4>Performance Letter</h4>
+            <p>Q3 2025 performance appreciation letter</p>
+            <div class="lm-date">📅 Issued: October 20, 2025</div>
+          </div>
+          <div class="letter-actions">
+            <button class="btn btn-outline btn-sm" onclick="openLetterModal('performance')">👁 View</button>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Performance Letter downloaded!','success')">⬇ Download</button>
+          </div>
+        </div>
+
+        <div class="letter-card" style="border:2px dashed var(--g200);background:var(--g50);align-items:center;justify-content:center;text-align:center;padding:32px">
+          <div style="font-size:2rem;margin-bottom:10px">📩</div>
+          <h4 style="margin-bottom:6px">Request a Letter</h4>
+          <p style="font-size:.82rem;color:var(--g500);margin-bottom:16px">Need a specific document?</p>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Request submitted to HR!','success')">Request Letter</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ LEAVE MANAGEMENT PAGE ══ -->
+    <section id="page-leave" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">Leave Management</span></div>
+      <div class="page-header"><h2>Leave Management</h2><p>Apply for leaves and track your requests</p></div>
+
+      <!-- Leave Balance -->
+      <div class="leave-balance-grid" id="leaveBalanceGrid"></div>
+
+      <!-- Tabs -->
+      <div class="leave-tabs">
+        <div class="leave-tab active" id="lt-apply" onclick="switchLeaveTab('apply')">Apply Leave</div>
+        <div class="leave-tab" id="lt-history" onclick="switchLeaveTab('history')">Leave History</div>
+        <div class="leave-tab" id="lt-pending" onclick="switchLeaveTab('pending')">Pending (2)</div>
+      </div>
+
+      <!-- Apply Tab -->
+      <div id="leave-apply-tab">
+        <div class="leave-form-card">
+          <div class="sec-title"><div><h3>Apply for Leave</h3><p>Fill in the details below</p></div></div>
+          <div class="form-row">
+            <div class="form-group" id="fg-ltype">
+              <label>Leave Type *</label>
+              <select id="leaveType">
+                <option value="">Select leave type</option>
+                <option>Annual Leave</option>
+                <option>Sick Leave</option>
+                <option>Casual Leave</option>
+                <option>Maternity Leave</option>
+                <option>Unpaid Leave</option>
+              </select>
+              <span class="err-msg">Please select a leave type</span>
+            </div>
+            <div class="form-group" id="fg-ldays">
+              <label>Number of Days</label>
+              <input type="text" id="leaveDays" readonly placeholder="Auto calculated">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" id="fg-lfrom">
+              <label>From Date *</label>
+              <input type="date" id="leaveFrom">
+              <span class="err-msg">Please select a start date</span>
+            </div>
+            <div class="form-group" id="fg-lto">
+              <label>To Date *</label>
+              <input type="date" id="leaveTo">
+              <span class="err-msg">Please select an end date</span>
+            </div>
+          </div>
+          <div class="form-group" id="fg-lreason">
+            <label>Reason *</label>
+            <textarea id="leaveReason" rows="3" placeholder="Please provide a reason for your leave request..."></textarea>
+            <span class="err-msg">Please provide a reason</span>
+          </div>
+          <div class="form-group">
+            <label>Handover Notes (Optional)</label>
+            <textarea rows="2" placeholder="Who will handle your tasks while you're away?"></textarea>
+          </div>
+          <div class="apply-btn-row">
+            <button class="btn btn-ghost btn-sm" onclick="clearLeaveForm()">Clear</button>
+            <button class="btn btn-primary" onclick="submitLeave()">Submit Request →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="leave-history-tab" style="display:none">
+        <div class="card card-pad">
+          <div class="sec-title"><div><h3>Leave History</h3></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Applied On</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="leaveHistoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Tab -->
+      <div id="leave-pending-tab" style="display:none">
+        <div class="card card-pad">
+          <div class="sec-title"><div><h3>Pending Approvals</h3></div></div>
+          <div id="pendingLeaveList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SALARY DETAILS PAGE ══ -->
+    <section id="page-salary" class="page-content">
+      <div class="breadcrumb"><span>Home</span><span class="sep">›</span><span class="active">Salary Details</span></div>
+      <div class="page-header"><h2>Salary Details</h2><p>Your complete salary structure and breakdown</p></div>
+
+      <div class="salary-top">
+        <div class="salary-hero">
+          <h3>Monthly Net Salary</h3>
+          <div class="amount">$4,680</div>
+          <div class="ctc">Annual CTC: $56,160 · Effective Jan 2026</div>
+          <div class="revision">↑ 12% increment applied from Jan 2026</div>
+        </div>
+        <div class="breakdown-card">
+          <div class="sec-title"><div><h3>Earnings & Deductions</h3></div></div>
+          <div class="sal-row"><span class="sr-label"><span class="sr-dot" style="background:var(--blue)"></span>Basic Salary</span><span class="sr-val">$3,000</span></div>
+          <div class="sal-row"><span class="sr-label"><span class="sr-dot" style="background:var(--green)"></span>HRA</span><span class="sr-val">$800</span></div>
+          <div class="sal-row"><span class="sr-label"><span class="sr-dot" style="background:var(--blue-l)"></span>Transport Allowance</span><span class="sr-val">$200</span></div>
+          <div class="sal-row"><span class="sr-label"><span class="sr-dot" style="background:var(--purple)"></span>Medical Allowance</span><span class="sr-val">$150</span></div>
+          <div class="sal-row"><span class="sr-label"><span class="sr-dot" style="background:var(--yellow)"></span>Special Allowance</span><span class="sr-val">$250</span></div>
+          <div style="margin:10px 0;padding:8px 0;border-top:1px dashed var(--g200);font-size:.8rem;font-weight:700;color:var(--g500);display:flex;justify-content:space-between"><span>GROSS SALARY</span><strong style="color:var(--g900)">$4,400</strong></div>
+          <div class="sal-row deduct"><span class="sr-label"><span class="sr-dot" style="background:var(--red)"></span>Income Tax</span><span class="sr-val">-$380</span></div>
+          <div class="sal-row deduct"><span class="sr-label"><span class="sr-dot" style="background:var(--orange)"></span>Provident Fund</span><span class="sr-val">-$180</span></div>
+          <div class="sal-row deduct"><span class="sr-label"><span class="sr-dot" style="background:var(--red)"></span>Health Insurance</span><span class="sr-val">-$60</span></div>
+          <div class="sal-row deduct" style="margin-bottom:8px"><span class="sr-label"><span class="sr-dot" style="background:var(--orange)"></span>Other Deductions</span><span class="sr-val">-$100</span></div>
+          <div class="sal-row net-row"><span class="sr-label">💰 NET SALARY</span><span class="sr-val">$4,680</span></div>
+        </div>
+      </div>
+
+      <!-- Component breakdown visual -->
+      <div class="card card-pad">
+        <div class="sec-title"><div><h3>Salary Components</h3><p>Visual breakdown of your pay structure</p></div></div>
+        <div style="display:flex;flex-direction:column;gap:12px" id="salaryBars"></div>
+      </div>
+
+      <!-- Salary History -->
+      <div class="card card-pad" style="margin-top:20px">
+        <div class="sec-title"><div><h3>Salary History</h3></div><button class="btn btn-outline btn-sm" onclick="goPage('payslips',null)">View Payslips →</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Period</th><th>Basic</th><th>Gross</th><th>Deductions</th><th>Net Salary</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Feb 2026</td><td>$3,000</td><td>$4,400</td><td>$720</td><td>$4,680</td><td><span class="badge badge-green">Credited</span></td></tr>
+              <tr><td>Jan 2026</td><td>$3,000</td><td>$4,400</td><td>$720</td><td>$4,680</td><td><span class="badge badge-green">Credited</span></td></tr>
+              <tr><td>Dec 2025</td><td>$2,700</td><td>$3,900</td><td>$680</td><td>$3,220</td><td><span class="badge badge-green">Credited</span></td></tr>
+              <tr><td>Nov 2025</td><td>$2,700</td><td>$3,900</td><td>$680</td><td>$3,220</td><td><span class="badge badge-green">Credited</span></td></tr>
+              <tr><td>Oct 2025</td><td>$2,700</td><td>$3,900</td><td>$680</td><td>$3,220</td><td><span class="badge badge-green">Credited</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /main-wrap -->
+</div><!-- /app-screen -->
+
+<!-- ══════════════ LETTER MODAL ══════════════ -->
+<div class="modal-overlay" id="letterModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="letterModalTitle">Letter Preview</h3>
+      <button class="modal-close" onclick="closeLetterModal()">✕</button>
+    </div>
+    <div class="modal-body" id="letterModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeLetterModal()">Close</button>
+      <button class="btn btn-primary btn-sm" onclick="showToast('Letter downloaded as PDF!','success');closeLetterModal()">⬇ Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const emp = {
+  name: 'Alex Kumar', firstName: 'Alex', id: 'HP001',
+  email: 'alex@hirepre.com', phone: '+91 98765 43210',
+  dept: 'Engineering', role: 'Senior Developer',
+  joined: 'March 15, 2022'
+};
+
+let currentPage = 'dashboard';
+let attMonthOffset = 0; // 0 = March 2026
+
+// ═══════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ═══════════════════════════════════════════
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  let valid = true;
+
+  const fgE = document.getElementById('fg-email');
+  const fgP = document.getElementById('fg-pw');
+  fgE.classList.remove('has-error');
+  fgP.classList.remove('has-error');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    fgE.classList.add('has-error');
+    fgE.querySelector('input').classList.add('error');
+    valid = false;
+  }
+  if (!pw || pw.length < 6) {
+    fgP.classList.add('has-error');
+    fgP.querySelector('input').classList.add('error');
+    valid = false;
+  }
+  if (!valid) return;
+
+  if (email === 'alex@hirepre.com' && pw === 'emp123') {
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('app-screen').classList.add('active');
+    initApp();
+    showToast('Welcome back, Alex! 👋', 'success');
+  } else {
+    showToast('Invalid credentials. Try alex@hirepre.com / emp123', 'error');
+    fgE.classList.add('has-error');
+    fgP.classList.add('has-error');
+  }
+}
+
+// Allow Enter key on login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').classList.contains('active')) doLogin();
+});
+
+function doLogout() {
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-screen').classList.add('active');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pw').value = '';
+  showToast('Logged out successfully', 'info');
+}
+
+// ═══════════════════════════════════════════
+//  APP INIT
+// ═══════════════════════════════════════════
+function initApp() {
+  buildDashMiniCal();
+  buildAttPage();
+  buildPayslips();
+  buildLeaveBalance();
+  buildLeaveHistory();
+  buildPendingLeaves();
+  buildSalaryBars();
+  buildAttLog();
+}
+
+// ═══════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════
+function goPage(name, el) {
+  document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    // find matching nav
+    document.querySelectorAll('.nav-item').forEach(i => {
+      if (i.getAttribute('onclick') && i.getAttribute('onclick').includes(`'${name}'`)) i.classList.add('active');
+    });
+  }
+
+  const titles = { dashboard: 'Dashboard', profile: 'My Profile', attendance: 'Attendance', payslips: 'Payslips', letters: 'Letters', leave: 'Leave Management', salary: 'Salary Details' };
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  currentPage = name;
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════════
+//  DASHBOARD MINI CALENDAR
+// ═══════════════════════════════════════════
+const marchData = {
+  1:'weekend',2:'present',3:'present',4:'present',5:'present',6:'present',7:'present',
+  8:'weekend',9:'present',10:'present',11:'present',12:'leave',13:'leave',14:'present',
+  15:'weekend',16:'present',17:'present',18:'absent',19:'present',20:'present',21:'present',
+  22:'weekend',23:'present',24:'present',25:'present',26:'present',27:'present',28:'present',
+  29:'weekend',30:'present',31:'absent'
+};
+
+function buildDashMiniCal() {
+  const days = ['S','M','T','W','T','F','S'];
+  let html = days.map(d => `<div class="att-day hd">${d}</div>`).join('');
+  // March 2026 starts on Sunday
+  for (let i = 0; i < 0; i++) html += `<div class="att-day"></div>`;
+  for (let d = 1; d <= 31; d++) {
+    const st = d === 3 ? 'today' : (marchData[d] || 'future');
+    html += `<div class="att-day ${st}">${d}</div>`;
+  }
+  document.getElementById('dashMiniCal').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+//  ATTENDANCE PAGE
+// ═══════════════════════════════════════════
+let attMonth = 2, attYear = 2026; // 0-indexed: 2 = March
+
+function changeAttMonth(dir) {
+  attMonth += dir;
+  if (attMonth < 0) { attMonth = 11; attYear--; }
+  if (attMonth > 11) { attMonth = 0; attYear++; }
+  buildAttPage();
+}
+
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function buildAttPage() {
+  document.getElementById('attMonthLabel').textContent = `${months[attMonth]} ${attYear}`;
+
+  const daysInMonth = new Date(attYear, attMonth + 1, 0).getDate();
+  const firstDay = new Date(attYear, attMonth, 1).getDay();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+  // Build status map (use march data for March, generate random for others)
+  const statusMap = {};
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dow = (firstDay + d - 1) % 7;
+    if (dow === 0 || dow === 6) { statusMap[d] = 'weekend'; continue; }
+    if (attMonth === 2 && attYear === 2026) {
+      statusMap[d] = marchData[d] || 'future';
+    } else {
+      const r = Math.random();
+      statusMap[d] = r > 0.9 ? 'absent' : r > 0.8 ? 'leave' : r > 0.75 ? 'holiday' : 'present';
+    }
+  }
+
+  // Summary
+  let p=0,a=0,l=0,h=0;
+  Object.values(statusMap).forEach(s => { if(s==='present')p++;else if(s==='absent')a++;else if(s==='leave')l++;else if(s==='holiday')h++; });
+  document.getElementById('attPresent').textContent = p;
+  document.getElementById('attAbsent').textContent = a;
+  document.getElementById('attLeave').textContent = l;
+  document.getElementById('attHoliday').textContent = h;
+
+  // Calendar
+  let html = days.map(d => `<div class="cal-head">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const s = statusMap[d];
+    const short = {present:'P',absent:'A',leave:'L',holiday:'H',weekend:'',future:''}[s] || '';
+    html += `<div class="cal-day ${s}"><span class="day-num">${d}</span><span class="day-status">${short}</span></div>`;
+  }
+  document.getElementById('attCalGrid').innerHTML = html;
+  buildAttLog(statusMap, firstDay, daysInMonth);
+}
+
+function buildAttLog(statusMap, firstDay, daysInMonth) {
+  const tbody = document.getElementById('attLogBody');
+  if (!tbody) return;
+  if (!statusMap) {
+    statusMap = marchData;
+    firstDay = 0;
+    daysInMonth = 31;
+  }
+  const days2 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = '';
+  for (let d = 1; d <= Math.min(daysInMonth, 15); d++) {
+    const s = statusMap[d] || 'present';
+    const dow = (firstDay + d - 1) % 7;
+    const checkIn = s === 'present' ? `0${8 + Math.floor(Math.random()*2)}:${Math.random()>0.5?'00':'30'} AM` : '—';
+    const checkOut = s === 'present' ? `0${5 + Math.floor(Math.random()*2)}:${Math.random()>0.5?'00':'30'} PM` : '—';
+    const hours = s === 'present' ? `${7 + Math.floor(Math.random()*2)}h ${Math.random()>0.5?'00':'30'}m` : '—';
+    const badge = {present:'badge-green',absent:'badge-red',leave:'badge-yellow',holiday:'badge-purple',weekend:'badge-gray',future:'badge-gray'}[s];
+    const label = s.charAt(0).toUpperCase() + s.slice(1);
+    html += `<tr><td>${months[attMonth].slice(0,3)} ${d}, ${attYear}</td><td>${days2[dow]}</td><td>${checkIn}</td><td>${checkOut}</td><td>${hours}</td><td><span class="badge ${badge}">${label}</span></td></tr>`;
+  }
+  tbody.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+//  PAYSLIPS
+// ═══════════════════════════════════════════
+const payslipData = [
+  {month:'February',year:2026,net:'$4,680',basic:'$3,000',hra:'$800',allow:'$600',deduct:'$720',status:'paid'},
+  {month:'January',year:2026,net:'$4,680',basic:'$3,000',hra:'$800',allow:'$600',deduct:'$720',status:'paid'},
+  {month:'December',year:2025,net:'$3,220',basic:'$2,700',hra:'$720',allow:'$480',deduct:'$680',status:'paid'},
+  {month:'November',year:2025,net:'$3,220',basic:'$2,700',hra:'$720',allow:'$480',deduct:'$680',status:'paid'},
+  {month:'October',year:2025,net:'$3,220',basic:'$2,700',hra:'$720',allow:'$480',deduct:'$680',status:'paid'},
+  {month:'September',year:2025,net:'$3,220',basic:'$2,700',hra:'$720',allow:'$480',deduct:'$680',status:'paid'},
+];
+
+function buildPayslips() {
+  document.getElementById('payslipGrid').innerHTML = payslipData.map(p => `
+    <div class="payslip-card">
+      <div class="ps-header">
+        <div class="month">${p.month} ${p.year}</div>
+        <div class="year">${p.status === 'paid' ? '✅ Salary Credited' : '⏳ Processing'}</div>
+      </div>
+      <div class="ps-body">
+        <div class="ps-amount">${p.net}</div>
+        <div class="ps-label">Net Take-Home</div>
+        <div class="ps-mini-breakdown">
+          <div class="ps-row"><span>Basic Salary</span><strong>${p.basic}</strong></div>
+          <div class="ps-row"><span>HRA</span><strong>${p.hra}</strong></div>
+          <div class="ps-row"><span>Allowances</span><strong>${p.allow}</strong></div>
+          <div class="ps-divider"></div>
+          <div class="ps-row deduction"><span>Total Deductions</span><strong>-${p.deduct}</strong></div>
+          <div class="ps-divider"></div>
+          <div class="ps-row net"><span>Net Salary</span><strong>${p.net}</strong></div>
+        </div>
+        <div class="ps-actions">
+          <button class="btn btn-outline btn-sm" style="flex:1" onclick="showToast('Opening payslip preview...','info')">👁 View</button>
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="showToast('${p.month} ${p.year} payslip downloaded!','success')">⬇ PDF</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+//  LEAVE MANAGEMENT
+// ═══════════════════════════════════════════
+const leaveBalance = [
+  {type:'Annual Leave',total:20,used:8,color:'var(--blue)',track:'var(--blue-100)'},
+  {type:'Sick Leave',total:12,used:2,color:'var(--green)',track:'var(--green-l)'},
+  {type:'Casual Leave',total:8,used:3,color:'var(--yellow)',track:'var(--yellow-l)'},
+  {type:'Unpaid Leave',total:10,used:0,color:'var(--purple)',track:'var(--purple-l)'},
+];
+
+let leaveHistory = [
+  {type:'Annual Leave',from:'Feb 20, 2026',to:'Feb 21, 2026',days:2,applied:'Feb 15, 2026',status:'Approved'},
+  {type:'Sick Leave',from:'Feb 10, 2026',to:'Feb 10, 2026',days:1,applied:'Feb 10, 2026',status:'Approved'},
+  {type:'Casual Leave',from:'Mar 5, 2026',to:'Mar 7, 2026',days:3,applied:'Mar 1, 2026',status:'Pending'},
+  {type:'Annual Leave',from:'Mar 20, 2026',to:'Mar 22, 2026',days:3,applied:'Mar 2, 2026',status:'Pending'},
+];
+
+function buildLeaveBalance() {
+  document.getElementById('leaveBalanceGrid').innerHTML = leaveBalance.map(lb => {
+    const remaining = lb.total - lb.used;
+    const pct = (lb.used / lb.total) * 100;
+    const r = 29, circ = 2 * Math.PI * r;
+    const dash = (pct / 100) * circ;
+    return `
+      <div class="lb-card">
+        <div class="lb-progress">
+          <svg viewBox="0 0 64 64">
+            <circle class="track" cx="32" cy="32" r="${r}" style="stroke:${lb.track}"/>
+            <circle class="fill" cx="32" cy="32" r="${r}" style="stroke:${lb.color};stroke-dasharray:${dash} ${circ};stroke-dashoffset:0" transform="rotate(-90 32 32)" stroke-linecap="round"/>
+          </svg>
+          <div class="lb-num" style="color:${lb.color}">${remaining}</div>
+        </div>
+        <h4>${lb.type.split(' ')[0]}</h4>
+        <p>${remaining} / ${lb.total} days left</p>
+      </div>`;
+  }).join('');
+}
+
+function buildLeaveHistory() {
+  const statusMap = {Approved:'badge-green',Rejected:'badge-red',Pending:'badge-yellow',Cancelled:'badge-gray'};
+  document.getElementById('leaveHistoryBody').innerHTML = leaveHistory.map((l,i) => `
+    <tr>
+      <td>${l.type}</td><td>${l.from}</td><td>${l.to}</td><td>${l.days}</td><td>${l.applied}</td>
+      <td><span class="badge ${statusMap[l.status]}">${l.status}</span></td>
+      <td>${l.status === 'Pending' ? `<button class="btn btn-danger btn-sm" onclick="cancelLeave(${i})">Cancel</button>` : '—'}</td>
+    </tr>`
+  ).join('');
+}
+
+function buildPendingLeaves() {
+  const pending = leaveHistory.filter(l => l.status === 'Pending');
+  if (pending.length === 0) {
+    document.getElementById('pendingLeaveList').innerHTML = '<p style="color:var(--g400);text-align:center;padding:24px 0">No pending leave requests</p>';
+    return;
+  }
+  document.getElementById('pendingLeaveList').innerHTML = pending.map(l => `
+    <div style="background:var(--yellow-l);border:1px solid #fde047;border-radius:10px;padding:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div>
+        <strong style="font-size:.9rem">${l.type}</strong>
+        <span style="font-size:.78rem;color:var(--g600);display:block;margin-top:2px">${l.from} → ${l.to} · ${l.days} day(s)</span>
+        <span style="font-size:.76rem;color:var(--g500)">Applied: ${l.applied}</span>
+      </div>
+      <span class="badge badge-yellow">⏳ Awaiting Approval</span>
+    </div>
+  `).join('');
+}
+
+function switchLeaveTab(tab) {
+  ['apply','history','pending'].forEach(t => {
+    document.getElementById(`lt-${t}`).classList.remove('active');
+    document.getElementById(`leave-${t}-tab`).style.display = 'none';
+  });
+  document.getElementById(`lt-${tab}`).classList.add('active');
+  document.getElementById(`leave-${tab}-tab`).style.display = 'block';
+}
+
+// Date range → days calculation
+['leaveFrom','leaveTo'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', calcDays);
+});
+function calcDays() {
+  const f = document.getElementById('leaveFrom').value;
+  const t = document.getElementById('leaveTo').value;
+  if (f && t) {
+    const diff = (new Date(t) - new Date(f)) / (86400000) + 1;
+    document.getElementById('leaveDays').value = diff > 0 ? `${diff} day(s)` : 'Invalid range';
+  }
+}
+
+function submitLeave() {
+  const type = document.getElementById('leaveType').value;
+  const from = document.getElementById('leaveFrom').value;
+  const to = document.getElementById('leaveTo').value;
+  const reason = document.getElementById('leaveReason').value.trim();
+  let valid = true;
+
+  [['fg-ltype','leaveType'],['fg-lfrom','leaveFrom'],['fg-lto','leaveTo'],['fg-lreason','leaveReason']].forEach(([fg,fid]) => {
+    const el = document.getElementById(fg);
+    const inp = document.getElementById(fid);
+    el.classList.remove('has-error');
+    if (!inp.value.trim()) { el.classList.add('has-error'); valid = false; }
+  });
+  if (!valid) { showToast('Please fill in all required fields', 'error'); return; }
+  if (new Date(to) < new Date(from)) {
+    showToast('End date cannot be before start date', 'error'); return;
+  }
+
+  const days = Math.ceil((new Date(to) - new Date(from)) / 86400000) + 1;
+  const today = new Date().toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+  leaveHistory.unshift({ type, from: new Date(from).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), to: new Date(to).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), days, applied: today, status: 'Pending' });
+  buildLeaveHistory();
+  buildPendingLeaves();
+  clearLeaveForm();
+  document.getElementById('pendingBadge').textContent = leaveHistory.filter(l=>l.status==='Pending').length;
+  showToast('Leave request submitted successfully! 🎉', 'success');
+  switchLeaveTab('history');
+}
+
+function clearLeaveForm() {
+  document.getElementById('leaveType').value = '';
+  document.getElementById('leaveFrom').value = '';
+  document.getElementById('leaveTo').value = '';
+  document.getElementById('leaveDays').value = '';
+  document.getElementById('leaveReason').value = '';
+  ['fg-ltype','fg-lfrom','fg-lto','fg-lreason'].forEach(id => document.getElementById(id).classList.remove('has-error'));
+}
+
+function cancelLeave(idx) {
+  if (!confirm('Cancel this leave request?')) return;
+  leaveHistory[idx].status = 'Cancelled';
+  buildLeaveHistory();
+  buildPendingLeaves();
+  document.getElementById('pendingBadge').textContent = leaveHistory.filter(l=>l.status==='Pending').length;
+  showToast('Leave request cancelled', 'info');
+}
+
+// ═══════════════════════════════════════════
+//  SALARY BARS
+// ═══════════════════════════════════════════
+function buildSalaryBars() {
+  const components = [
+    {label:'Basic Salary',amount:3000,total:4400,color:'var(--blue)'},
+    {label:'HRA',amount:800,total:4400,color:'var(--green)'},
+    {label:'Transport Allowance',amount:200,total:4400,color:'var(--blue-l)'},
+    {label:'Medical Allowance',amount:150,total:4400,color:'var(--purple)'},
+    {label:'Special Allowance',amount:250,total:4400,color:'var(--yellow)'},
+  ];
+  document.getElementById('salaryBars').innerHTML = components.map(c => {
+    const pct = (c.amount / c.total * 100).toFixed(1);
+    return `
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.84rem;margin-bottom:5px">
+          <span style="color:var(--g600);font-weight:500">${c.label}</span>
+          <strong style="color:var(--g900)">$${c.amount.toLocaleString()} <span style="color:var(--g400);font-weight:400">(${pct}%)</span></strong>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${c.color}"></div></div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  PROFILE EDIT
+// ═══════════════════════════════════════════
+function toggleEditForm() {
+  const f = document.getElementById('editForm');
+  f.classList.toggle('open');
+}
+function saveProfile() {
+  showToast('Profile updated successfully! ✓', 'success');
+  document.getElementById('editForm').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════
+//  LETTERS MODAL
+// ═══════════════════════════════════════════
+const letterContent = {
+  offer: {
+    title: 'Offer Letter',
+    html: `<div class="letter-doc">
+      <div class="doc-header">
+        <div class="company-name">Hirepre Solution</div>
+        <div class="company-addr">42 Innovation Drive, Tech Park, Bangalore 560001 · hello@hiepresolution.com</div>
+      </div>
+      <p style="text-align:right;font-size:.82rem;color:var(--g500)">Date: March 1, 2022</p>
+      <p class="doc-title">LETTER OF OFFER</p>
+      <div class="doc-body">
+        <p>Dear <strong>Alex Kumar</strong>,</p>
+        <p>We are pleased to offer you the position of <strong>Senior Developer</strong> in the <strong>Engineering Department</strong> at Hirepre Solution. We believe your skills and experience will be a great addition to our team.</p>
+        <p>Please find below the details of your offer:</p>
+        <table class="doc-table">
+          <tr><th>Component</th><th>Details</th></tr>
+          <tr><td>Position</td><td>Senior Developer</td></tr>
+          <tr><td>Department</td><td>Engineering</td></tr>
+          <tr><td>Date of Joining</td><td>March 15, 2022</td></tr>
+          <tr><td>Annual CTC</td><td>$42,000</td></tr>
+          <tr><td>Employment Type</td><td>Full-time, Permanent</td></tr>
+        </table>
+        <p>This offer is contingent upon successful completion of background verification. Please confirm your acceptance by signing and returning a copy of this letter.</p>
+        <p>We look forward to welcoming you to Hirepre Solution!</p>
+      </div>
+      <div class="doc-sign">
+        <p>Warm regards,</p>
+        <br>
+        <span class="sig-line">Sarah Lee<br>CEO, Hirepre Solution</span>
+      </div>
+    </div>`
+  },
+  hike: {
+    title: 'Increment / Hike Letter',
+    html: `<div class="letter-doc">
+      <div class="doc-header">
+        <div class="company-name">Hirepre Solution</div>
+        <div class="company-addr">42 Innovation Drive, Tech Park, Bangalore 560001</div>
+      </div>
+      <p style="text-align:right;font-size:.82rem;color:var(--g500)">Date: January 10, 2026</p>
+      <p class="doc-title">SALARY INCREMENT LETTER</p>
+      <div class="doc-body">
+        <p>Dear <strong>Alex Kumar</strong>,</p>
+        <p>It gives us great pleasure to inform you that based on your outstanding performance, dedication, and contribution to Hirepre Solution, the management has decided to revise your compensation with effect from <strong>January 1, 2026</strong>.</p>
+        <table class="doc-table">
+          <tr><th>Particulars</th><th>Previous (Annual)</th><th>Revised (Annual)</th></tr>
+          <tr><td>Basic Salary</td><td>$32,400</td><td>$36,000</td></tr>
+          <tr><td>HRA</td><td>$8,640</td><td>$9,600</td></tr>
+          <tr><td>Total CTC</td><td>$50,160</td><td>$56,160</td></tr>
+        </table>
+        <p>This represents an increment of <strong>12%</strong> on your previous CTC. We appreciate your hard work and commitment to excellence.</p>
+        <p>We look forward to your continued contributions to the organization.</p>
+      </div>
+      <div class="doc-sign">
+        <p>Sincerely,</p><br>
+        <span class="sig-line">Sarah Lee<br>CEO, Hirepre Solution</span>
+      </div>
+    </div>`
+  },
+  experience: {
+    title: 'Experience Letter',
+    html: `<div class="letter-doc">
+      <div class="doc-header">
+        <div class="company-name">Hirepre Solution</div>
+        <div class="company-addr">42 Innovation Drive, Tech Park, Bangalore 560001</div>
+      </div>
+      <p style="text-align:right;font-size:.82rem;color:var(--g500)">Date: February 5, 2026<br>Ref: HP/EXP/2026/001</p>
+      <p class="doc-title">TO WHOM IT MAY CONCERN</p>
+      <div class="doc-body">
+        <p>This is to certify that <strong>Mr. Alex Kumar</strong> (Employee ID: HP001) has been working with Hirepre Solution as a <strong>Senior Developer</strong> in the Engineering Department since <strong>March 15, 2022</strong>.</p>
+        <p>During his tenure, Mr. Kumar has demonstrated exceptional technical expertise, leadership skills, and a consistent commitment to delivering high-quality work. He has been a valuable member of our team and has contributed significantly to various key projects.</p>
+        <p>This letter is issued at the request of the employee for <strong>background verification purposes</strong>.</p>
+        <p>We wish him all the best in his future endeavors.</p>
+      </div>
+      <div class="doc-sign">
+        <p>For Hirepre Solution,</p><br>
+        <span class="sig-line">Priya Nair<br>Head of HR, Hirepre Solution</span>
+      </div>
+    </div>`
+  },
+  appointment: {
+    title: 'Appointment Letter',
+    html: `<div class="letter-doc">
+      <div class="doc-header">
+        <div class="company-name">Hirepre Solution</div>
+        <div class="company-addr">42 Innovation Drive, Tech Park, Bangalore 560001</div>
+      </div>
+      <p style="text-align:right;font-size:.82rem;color:var(--g500)">Date: March 15, 2022</p>
+      <p class="doc-title">APPOINTMENT LETTER</p>
+      <div class="doc-body">
+        <p>Dear <strong>Alex Kumar</strong>,</p>
+        <p>Following our discussions and your acceptance of our offer letter dated March 1, 2022, we are pleased to formally appoint you as <strong>Senior Developer</strong> at Hirepre Solution with effect from <strong>March 15, 2022</strong>.</p>
+        <p>Your appointment is subject to the following terms and conditions:</p>
+        <table class="doc-table">
+          <tr><th>Terms</th><th>Details</th></tr>
+          <tr><td>Designation</td><td>Senior Developer</td></tr>
+          <tr><td>Department</td><td>Engineering</td></tr>
+          <tr><td>Working Hours</td><td>9:00 AM – 6:00 PM (Mon–Fri)</td></tr>
+          <tr><td>Probation Period</td><td>3 Months</td></tr>
+          <tr><td>Notice Period</td><td>30 Days</td></tr>
+        </table>
+        <p>Please sign and return the duplicate of this letter as a token of your acceptance.</p>
+      </div>
+      <div class="doc-sign">
+        <p>For Hirepre Solution,</p><br>
+        <span class="sig-line">Sarah Lee<br>CEO, Hirepre Solution</span>
+      </div>
+    </div>`
+  },
+  performance: {
+    title: 'Performance Appreciation Letter',
+    html: `<div class="letter-doc">
+      <div class="doc-header">
+        <div class="company-name">Hirepre Solution</div>
+        <div class="company-addr">42 Innovation Drive, Tech Park, Bangalore 560001</div>
+      </div>
+      <p style="text-align:right;font-size:.82rem;color:var(--g500)">Date: October 20, 2025</p>
+      <p class="doc-title">PERFORMANCE APPRECIATION LETTER</p>
+      <div class="doc-body">
+        <p>Dear <strong>Alex Kumar</strong>,</p>
+        <p>It is with great pleasure that we recognize your outstanding performance during the <strong>Q3 2025 (July – September 2025)</strong> review period.</p>
+        <p>Your performance score of <strong>96/100</strong> reflects your exceptional work ethic, technical expertise, and commitment to quality. Some of your key achievements this quarter include:</p>
+        <table class="doc-table">
+          <tr><th>Achievement</th><th>Impact</th></tr>
+          <tr><td>Led API redesign project</td><td>30% performance improvement</td></tr>
+          <tr><td>Mentored 2 junior developers</td><td>Team productivity +20%</td></tr>
+          <tr><td>Zero critical bugs in production</td><td>99.9% uptime maintained</td></tr>
+        </table>
+        <p>Your dedication and positive attitude are truly commendable. The management is proud to have you as part of our team and looks forward to your continued excellence.</p>
+      </div>
+      <div class="doc-sign">
+        <p>With appreciation,</p><br>
+        <span class="sig-line">James Wong<br>Engineering Manager, Hirepre Solution</span>
+      </div>
+    </div>`
+  }
+};
+
+function openLetterModal(type) {
+  const lc = letterContent[type];
+  if (!lc) return;
+  document.getElementById('letterModalTitle').textContent = lc.title;
+  document.getElementById('letterModalBody').innerHTML = lc.html;
+  document.getElementById('letterModal').classList.add('active');
+}
+function closeLetterModal() {
+  document.getElementById('letterMo
